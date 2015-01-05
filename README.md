@@ -21,6 +21,28 @@ project, type:
 
 ### Usage:
 
+Once you have installed the spark, you just have to load 'jade-spark' in your controller by adding:
+ `$this->load->spark('jade-spark/0.0.1');`
+
+*a good practice to load sparks would be override controller's constructor, eg:*
+```php
+    public function __construct(){
+   		parent::__construct();
+   		$this->load->spark('jade-spark/0.0.1');
+    }
+```
+
+Create a view template, with `.jade` extension, defaulted in `views` directory of your Codeigniter app. *(This directory can be changed in spark's configuration.)*
+
+*For Jade-lang references [click here](http://jade-lang.com/reference/)*
+
+Finally, invoke `render` method in your controller, passing template name as first argument and optional array of params as second argument.
+
+```php
+...
+$this->jade_spark->render("welcome",$params);
+...
+```
 
 ### Examples:
 
