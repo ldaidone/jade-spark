@@ -6,6 +6,8 @@
  * Time: 1:12 PM
  */
 
+require_once(dirname(__FILE__)."/CLIStatus.php");
+
 class Jade_spark {
 
     public function render($jadefile, $params=[])
@@ -13,17 +15,19 @@ class Jade_spark {
         $fullpath = $this->getTemplateFullPath($this->sanitizeFilename($jadefile));
 
         $command = $this->getCommand($fullpath, $this->encodeParams($params));
+
         $this->printOutput($command, $params, $fullpath);
     }
 
     // Private scope
     private function getCommand($fullpath, $params_json){
         $jade_tpl_path = config_item('jade_tpl_path');
-        return "{$this->getJadeBin()} < {$fullpath} --path {$jade_tpl_path}d --obj {$params_json}";
+        return "{$this->getJadeBin()} < {$fullpath} -p {$jade_tpl_path}d -O {$params_json}";
     }
 
     private function getJadeBin(){
-        return escapeshellarg(config_item('jade_bin'));
+        $bin = config_item('jade_bin');
+        return $bin;
     }
 
     private function getTemplateFullPath($jade_file){
@@ -48,16 +52,16 @@ class Jade_spark {
     private function printOutput($command, $params, $fullpath){
         $status = 0;
         $output = array();
+
         exec($command, $output, $status);
-        if($status==0){
+        $cliStatus = CLIStatus::parseCliStatus($status);
+
+        if($cliStatus->success){
             echo join(' ',$output);
         }else{
             $params = $this->encodeParams($params,JSON_PRETTY_PRINT);
-            if(join(' ',$output)){
-                echo "<pre><h5>command:<br/>{$command}</h5><h5>params:{$params}<br/></h5><h5>Issue:{join(' ',$output)}</h5></pre>";
-            }else{
-                echo "<pre><h5>command:<br/>{$command}</h5><h5>params:{$params}<br/></h5><h5>Issue:<br>probably file not found(please check if file {$fullpath} exists)</h5></pre>";
-            }
+            $extra = (join(' ',$output)) ? join(' ',$output) : null;
+            CLIStatus::prettyPrintError($cliStatus->errorMsg, $command, $params, $extra);
         }
     }
 }

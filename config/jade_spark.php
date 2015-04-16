@@ -7,7 +7,7 @@
  */
 
 // if you don't know what it is type `which jade` in your terminal
-$config['jade_bin'] = "/usr/bin/jade";
+$config['jade_bin'] = "/usr/local/bin/node /usr/local/bin/jade";
 
 //enter your template path here,defaulted for Codeigniter at views/
 $config['jade_tpl_path'] = APPPATH . 'views/';
